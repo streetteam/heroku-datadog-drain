@@ -34,6 +34,7 @@ app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
       logger.connect(function(e) {
+        console.log(e);
         logger.socket.write(process.env.DD_API_KEY + ' ' + (line.split(' ')[1] || line) + '\n', 'utf8');
       });
     });
