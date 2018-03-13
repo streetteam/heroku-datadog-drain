@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Funnel metrics from multiple Heroku apps into DataDog using statsd",
   "engines": {
-    "node": "0.12.x"
-  },
+    "npm": "5.7.1"
+  }
   "homepage": "https://github.com/ozinc/heroku-datadog-drain",
   "repository": {
     "type": "git",
