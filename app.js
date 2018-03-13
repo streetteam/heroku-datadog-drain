@@ -14,6 +14,7 @@ if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
 }
 
+app.use(express.bodyParser());
 app.use(function authenticate (req, res, next) {
   let auth = basicAuth(req) || {};
   let app = allowedApps[auth.name];
@@ -28,7 +29,6 @@ app.use(function authenticate (req, res, next) {
 });
 
 app.post('/', function (req, res) {
-      console.log(req.body);
   if(req.body !== undefined) {
     req.body.pipe(through(line => processLine(line)));
   }
@@ -48,11 +48,8 @@ app.listen(port, function () {
  */
 function processLine (line) {
   let client = new net.Socket();
-    console.log(line);
   client.connect(10516, '127.0.0.1', function() {
-      console.log('connected');
     client.write(line + '\n', 'binary', function() {
-        console.log('written');
       client.end();
     });
   });
