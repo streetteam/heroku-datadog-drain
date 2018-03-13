@@ -9,12 +9,13 @@ let basicAuth = require('basic-auth');
 let app = module.exports = express();
 let allowedApps = loadAllowedAppsFromEnv();
 let net = require('net');
+var bodyParser = require('body-parser');
 
 if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
 }
 
-app.use(express.bodyParser());
+app.use(bodyParser());
 app.use(function authenticate (req, res, next) {
   let auth = basicAuth(req) || {};
   let app = allowedApps[auth.name];
