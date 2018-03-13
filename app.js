@@ -8,8 +8,9 @@ let urlUtil = require('url');
 let basicAuth = require('basic-auth');
 let app = module.exports = express();
 let allowedApps = loadAllowedAppsFromEnv();
-let net = require('net');
-var bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
+let syslog = require('syslog-tls');
+let logger = syslog.createClient(10516, 'intake.logs.datadoghq.com');
 
 if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
@@ -32,11 +33,8 @@ app.use(function authenticate (req, res, next) {
 app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
-      let client = new net.Socket();
-      client.connect(10516, '127.0.0.1', function() {
-        client.write((line.split(/>1 /)[1] || line) + '\n', 'binary', function() {
-          client.end();
-        });
+      logger.connect(function(e) {
+        this.socket.write(process.env.DD_API_KEY + ' ' + (line.split(' ')[1] || line) + '\n', 'utf8');
       });
     });
   }
