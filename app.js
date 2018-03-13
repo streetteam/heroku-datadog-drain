@@ -2,7 +2,6 @@
 
 let _ = require('lodash');
 let assert = require('assert');
-let logfmt = require('logfmt');
 let express = require('express');
 let through = require('through');
 let urlUtil = require('url');
@@ -15,7 +14,6 @@ if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
 }
 
-app.use(logfmt.bodyParserStream());
 app.use(function authenticate (req, res, next) {
   let auth = basicAuth(req) || {};
   let app = allowedApps[auth.name];
@@ -50,7 +48,6 @@ app.listen(port, function () {
 function processLine (line) {
   let client = new net.Socket();
   client.connect(10516, '127.0.0.1', function() {
-      console.log(line);
       client.write(line);
       client.destroy();
   });
