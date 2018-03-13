@@ -31,7 +31,12 @@ app.use(function authenticate (req, res, next) {
 
 app.post('/', function (req, res) {
   if(req.body !== undefined) {
-    req.body.pipe(through(line => processLine(line)));
+    let client = new net.Socket();
+    client.connect(10516, '127.0.0.1', function() {
+      client.write(line + '\n', 'binary', function() {
+        client.end();
+      });
+    });
   }
 
   res.send('OK');
@@ -41,20 +46,6 @@ let port = process.env.PORT || 3000;
 app.listen(port, function () {
   console.log('Server listening on port ' + port);
 });
-
-
-/**
- * Matches a line against a rule and processes it
- * @param {object} line
- */
-function processLine (line) {
-  let client = new net.Socket();
-  client.connect(10516, '127.0.0.1', function() {
-    client.write(line + '\n', 'binary', function() {
-      client.end();
-    });
-  });
-}
 
 
 /**
