@@ -33,7 +33,7 @@ app.post('/', function (req, res) {
   if(req.body !== undefined) {
     let client = new net.Socket();
     client.connect(10516, '127.0.0.1', function() {
-      client.write(line + '\n', 'binary', function() {
+      client.write(req.body + '\n', 'binary', function() {
         client.end();
       });
     });
