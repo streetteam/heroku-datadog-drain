@@ -31,10 +31,12 @@ app.use(function authenticate (req, res, next) {
 
 app.post('/', function (req, res) {
   if(req.body !== undefined) {
-    let client = new net.Socket();
-    client.connect(10516, '127.0.0.1', function() {
-      client.write(req.body.split(/>1 /)[1] + '\n', 'binary', function() {
-        client.end();
+    req.body.split('\n').forEach(function(line, index, arr) {
+      let client = new net.Socket();
+      client.connect(10516, '127.0.0.1', function() {
+        client.write(line.split(/>1 /)[1] + '\n', 'binary', function() {
+          client.end();
+        });
       });
     });
   }
