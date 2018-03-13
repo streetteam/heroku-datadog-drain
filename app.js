@@ -34,7 +34,7 @@ app.post('/', function (req, res) {
     req.body.split('\n').forEach(function(line, index, arr) {
       let client = new net.Socket();
       client.connect(10516, '127.0.0.1', function() {
-        client.write(line.split(/>1 /)[1] + '\n', 'binary', function() {
+        client.write((line.split(/>1 /)[1] || line) + '\n', 'binary', function() {
           client.end();
         });
       });
