@@ -39,7 +39,7 @@ app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
       let socket = tls.connect(10516, 'intake.logs.datadoghq.com', clientOptions, function() {
-        socket.write(process.env.DD_API_KEY + ' ' + (line.split(' ')[1] || line) + '\n', 'utf8', function() {
+        socket.write(process.env.DD_API_KEY + ' ' + (line.split(/ /)[1] || line) + '\n', 'utf8', function() {
           socket.end();
         });
       });
