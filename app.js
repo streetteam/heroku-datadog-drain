@@ -50,6 +50,7 @@ function processLine (line) {
   client.connect(10516, '127.0.0.1', function() {
       console.log(line);
       client.write(line);
+      client.disconnect();
   });
 }
 
