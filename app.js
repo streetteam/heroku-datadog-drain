@@ -48,7 +48,7 @@ app.listen(port, function () {
 function processLine (line) {
   let client = new net.Socket();
   client.connect(10516, '127.0.0.1', function() {
-      client.write(line + '\r');
+      client.write(line + '\n');
       client.end();
   });
 }
