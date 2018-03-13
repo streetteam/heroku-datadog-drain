@@ -28,6 +28,7 @@ app.use(function authenticate (req, res, next) {
 });
 
 app.post('/', function (req, res) {
+      console.log(req.body);
   if(req.body !== undefined) {
     req.body.pipe(through(line => processLine(line)));
   }
