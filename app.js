@@ -15,7 +15,7 @@ if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
 }
 
-app.use(bodyParser.raw());
+app.use(bodyParser.text({'type': function() { return true; }}));
 app.use(function authenticate (req, res, next) {
   let auth = basicAuth(req) || {};
   let app = allowedApps[auth.name];
