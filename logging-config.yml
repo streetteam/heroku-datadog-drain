@@ -3,6 +3,6 @@ instances:
 
 logs:
   - type: tcp
-    port: 10516
+    port: 10514
     service: prod-ambassador-api
     source: heroku
