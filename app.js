@@ -8,9 +8,14 @@ let urlUtil = require('url');
 let basicAuth = require('basic-auth');
 let app = module.exports = express();
 let allowedApps = loadAllowedAppsFromEnv();
+let net = require('net');
 let bodyParser = require('body-parser');
-let syslog = require('syslog-tls');
-let logger = syslog.createClient(10516, 'intake.logs.datadoghq.com');
+let tls = require('tls');
+let fs = require('fs');
+
+let clientOptions = {
+  cert: [ fs.readFileSync('files/intake.logs.datadoghq.com.crt') ]
+};
 
 if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
@@ -33,10 +38,12 @@ app.use(function authenticate (req, res, next) {
 app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
-      logger.connect(function(e) {
-        console.log(e);
-        logger.socket.write(process.env.DD_API_KEY + ' ' + (line.split(' ')[1] || line) + '\n', 'utf8');
+      let socket = tls.connect(10516, 'intake.logs.datadoghq.com', clientOptions, function() {
+        socket.write((line.split(/>1 /)[1] || line) + '\n', 'utf8', function() {
+          socket.end();
+        });
       });
+      socket.setEncoding('utf8');
     });
   }
 
