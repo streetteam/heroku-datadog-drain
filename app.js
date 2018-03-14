@@ -10,12 +10,14 @@ let app = module.exports = express();
 let allowedApps = loadAllowedAppsFromEnv();
 let net = require('net');
 let bodyParser = require('body-parser');
-let tls = require('tls');
-let fs = require('fs');
+let yaml = require('js-yaml');
 
-let clientOptions = {
-  cert: [ fs.readFileSync('files/intake.logs.datadoghq.com.crt') ]
-};
+let loggingConfigPath = '/app/.apt/etc/datadog-agent/conf.d/logging.d/config.yml';
+let loggingConfig = yaml.safeLoad(fs.readFileSync(loggingConfigPath, 'utf8'));
+let ports = loggingConfig.logs.reduce(function(obj, item) {
+    obj[item.name.replace('-', '_')] = item.port;
+    return obj;
+});
 
 if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
@@ -26,6 +28,7 @@ app.use(function authenticate (req, res, next) {
   let auth = basicAuth(req) || {};
   let app = allowedApps[auth.name];
   if (app !== undefined && app.password === auth.pass) {
+    req.appName = auth.name;
     next();
   } else {
     res.status(401).send('Unauthorized');
@@ -38,12 +41,12 @@ app.use(function authenticate (req, res, next) {
 app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
-      let socket = tls.connect(10516, 'intake.logs.datadoghq.com', clientOptions, function() {
-        socket.write(process.env.DD_API_KEY + ' ' + (line.slice(line.indexOf(' ')+1) || line) + '\n', 'utf8', function() {
-          socket.end();
+      let client = new net.Socket();
+      client.connect(ports[req.appName], '127.0.0.1', function() {
+        client.write((line.split(/>1 /)[1] || line) + '\n', 'binary', function() {
+          client.end();
         });
       });
-      socket.setEncoding('utf8');
     });
   }
 
@@ -62,9 +65,9 @@ app.listen(port, function () {
  */
 function loadAllowedAppsFromEnv () {
   assert(process.env.ALLOWED_APPS, 'Environment variable ALLOWED_APPS required');
-  let appNames = process.env.ALLOWED_APPS.split(',').map(function(name) {
+  let appNames = process.env.ALLOWED_APPS.split(',').map(function(name, index, arr) {
       return name.trim();
-  });
+  };
   let apps = appNames.map(function (name) {
     // Password
     var passwordEnvName = name.toUpperCase() + '_PASSWORD';
