@@ -62,7 +62,9 @@ app.listen(port, function () {
  */
 function loadAllowedAppsFromEnv () {
   assert(process.env.ALLOWED_APPS, 'Environment variable ALLOWED_APPS required');
-  let appNames = process.env.ALLOWED_APPS.split(',');
+  let appNames = process.env.ALLOWED_APPS.split(',').map(function(name) {
+      return name.trim();
+  });
   let apps = appNames.map(function (name) {
     // Password
     var passwordEnvName = name.toUpperCase() + '_PASSWORD';
