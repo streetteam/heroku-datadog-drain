@@ -16,8 +16,7 @@ let fs = require('fs');
 let loggingConfigPath = '/app/.apt/etc/datadog-agent/conf.d/logging.d/config.yml';
 let loggingConfig = yaml.safeLoad(fs.readFileSync(loggingConfigPath, 'utf8'));
 let ports = loggingConfig.logs.reduce(function(obj, item) {
-    obj[item.service.replace('-', '_')] = item.port;
-    return obj;
+    return { item.service.replace('-', '_'): item.port };
 });
 console.log(loggingConfig);
 console.log(ports);
