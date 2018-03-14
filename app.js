@@ -11,6 +11,7 @@ let allowedApps = loadAllowedAppsFromEnv();
 let net = require('net');
 let bodyParser = require('body-parser');
 let yaml = require('js-yaml');
+let fs = require('fs');
 
 let loggingConfigPath = '/app/.apt/etc/datadog-agent/conf.d/logging.d/config.yml';
 let loggingConfig = yaml.safeLoad(fs.readFileSync(loggingConfigPath, 'utf8'));
