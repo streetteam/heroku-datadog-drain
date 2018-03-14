@@ -1,5 +1,6 @@
-let yaml = require('js-yaml');
+let assert = require('assert');
 let fs = require('fs');
+let yaml = require('js-yaml');
 
 let port = 10514;
 let template = {
