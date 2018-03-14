@@ -19,6 +19,8 @@ let ports = loggingConfig.logs.reduce(function(obj, item) {
     obj[item.service.replace('-', '_')] = item.port;
     return obj;
 });
+console.log(loggingConfig);
+console.log(ports);
 
 if (process.env.DEBUG) {
   console.log('Allowed apps', allowedApps);
@@ -43,6 +45,8 @@ app.post('/', function (req, res) {
   if(req.body !== undefined) {
     req.body.split('\n').forEach(function(line, index, arr) {
       let client = new net.Socket();
+        console.log(req.appName);
+        console.log('port: ' + ports[req.appName]);
       client.connect(ports[req.appName], '127.0.0.1', function() {
         client.write((line.split(/>1 /)[1] || line) + '\n', 'binary', function() {
           client.end();
