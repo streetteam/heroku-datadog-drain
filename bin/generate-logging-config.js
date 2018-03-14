@@ -16,7 +16,7 @@ appNames.forEach(function(name, index, arr) {
     template.logs.push({
         type: 'tcp',
         port: port++,
-        service: name.replace('_', '-').trim(),
+        service: name.replace(/_/g, '-').trim(),
         source: 'heroku'
     });
 });
